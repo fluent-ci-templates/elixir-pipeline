@@ -1,5 +1,5 @@
 import Client from "@dagger.io/dagger";
-import { withDevbox } from "https://deno.land/x/nix_installer_pipeline@v0.3.3/src/dagger/steps.ts";
+import { withDevbox } from "https://deno.land/x/nix_installer_pipeline@v0.3.6/src/dagger/steps.ts";
 
 export const test = async (client: Client, src = ".") => {
   const context = client.host().directory(src);
@@ -10,10 +10,11 @@ export const test = async (client: Client, src = ".") => {
       .from("alpine:latest")
       .withExec(["apk", "update"])
       .withExec(["apk", "add", "bash", "curl"])
+      .withMountedCache("/nix", client.cacheVolume("nix"))
+      .withMountedCache("/etc/nix", client.cacheVolume("nix-etc"))
   );
 
   const ctr = baseCtr
-    .withMountedCache("/nix", client.cacheVolume("nix"))
     .withDirectory("/app", context, {
       exclude: [".git", ".devbox", "deps", "_build"],
     })
