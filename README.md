@@ -45,9 +45,11 @@ import { Dagger } from "https://deno.land/x/elixir_pipeline/mod.ts";
 
 const { test } = Dagger;
 
-export default function pipeline(src = ".") {
+function pipeline(src = ".") {
   connect(async (client: Client) => {
     await test(client, src);
   });
 }
+
+pipeline();
 ```
