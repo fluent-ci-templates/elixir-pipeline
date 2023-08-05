@@ -9,7 +9,7 @@ export const test = async (client: Client, src = ".") => {
   const context = client.host().directory(src);
   const baseCtr = withDevbox(
     client
-      .pipeline("tests")
+      .pipeline(Job.test)
       .container()
       .from("alpine:latest")
       .withExec(["apk", "update"])
