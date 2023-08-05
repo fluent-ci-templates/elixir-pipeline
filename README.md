@@ -9,7 +9,7 @@ A ready-to-use CI/CD Pipeline for Elixir projects.
 
 ## 🚀 Usage
 
-Run the following command:
+Run the following command in your project root:
 
 ```bash
 dagger run fluentci elixir_pipeline
