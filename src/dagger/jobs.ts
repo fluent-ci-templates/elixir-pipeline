@@ -1,6 +1,10 @@
 import Client from "@dagger.io/dagger";
 import { withDevbox } from "https://deno.land/x/nix_installer_pipeline@v0.3.6/src/dagger/steps.ts";
 
+export enum Job {
+  test = "test",
+}
+
 export const test = async (client: Client, src = ".") => {
   const context = client.host().directory(src);
   const baseCtr = withDevbox(
@@ -47,4 +51,14 @@ export const test = async (client: Client, src = ".") => {
   const result = await ctr.stdout();
 
   console.log(result);
+};
+
+export type JobExec = (client: Client, src?: string) => Promise<void>;
+
+export const runnableJobs: Record<Job, JobExec> = {
+  [Job.test]: test,
+};
+
+export const jobDescriptions: Record<Job, string> = {
+  [Job.test]: "Run your tests",
 };
