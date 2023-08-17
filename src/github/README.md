@@ -3,10 +3,10 @@
 The following command will generate a `.github/workflows/tests.yml` file in your project:
 
 ```bash
-fluentci gh init -t ruby_pipeline
+fluentci gh init -t elixir_pipeline
 ```
 
-Or, if you already have a `.fluentci` folder (generated from `fluentci init -t ruby`) in your project:
+Or, if you already have a `.fluentci` folder (generated from `fluentci init -t elixir`) in your project:
 
 ```bash
 fluentci gh init
