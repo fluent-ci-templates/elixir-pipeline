@@ -3,7 +3,7 @@
 Run the following commands to run Elixir Pipeline on this project:
 
 ```bash
-dagger run deno run -A https://deno.land/x/elixir_pipeline/ci.ts
+dagger run fluentci .
 ```
 
 To start your Phoenix server:
