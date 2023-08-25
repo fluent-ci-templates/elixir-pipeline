@@ -1,5 +1,9 @@
 import { JobSpec, Workflow } from "fluent_github_actions";
 
+/**
+ * Generates a GitHub Actions workflow for testing an Elixir pipeline.
+ * @returns The generated workflow.
+ */
 export function generateYaml(): Workflow {
   const workflow = new Workflow("Test");
 
