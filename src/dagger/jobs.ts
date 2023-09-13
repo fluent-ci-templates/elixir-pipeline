@@ -5,6 +5,8 @@ export enum Job {
   test = "test",
 }
 
+export const exclude = [".git", ".devbox", "deps", "_build"];
+
 export const test = async (client: Client, src = ".") => {
   const context = client.host().directory(src);
   const baseCtr = withDevbox(
@@ -19,9 +21,7 @@ export const test = async (client: Client, src = ".") => {
   );
 
   const ctr = baseCtr
-    .withDirectory("/app", context, {
-      exclude: [".git", ".devbox", "deps", "_build"],
-    })
+    .withDirectory("/app", context, { exclude })
     .withWorkdir("/app")
     .withMountedCache("/root/.mix", client.cacheVolume("mix"))
     .withMountedCache("/app/deps", client.cacheVolume("deps"))
