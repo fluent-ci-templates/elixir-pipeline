@@ -42,7 +42,7 @@ You can also use this pipeline programmatically:
 
 ```ts
 import Client, { connect } from "https://sdk.fluentci.io/v0.1.6/mod.ts";
-import { test } from "https://pkg.fluentci.io/elixir_pipeline@v0.5.0/mod.ts";
+import { test } from "https://pkg.fluentci.io/elixir_pipeline@v0.5.1/mod.ts";
 
 function pipeline(src = ".") {
   connect(async (client: Client) => {
