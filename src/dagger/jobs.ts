@@ -1,5 +1,4 @@
-import Client from "@fluentci.io/dagger";
-import { withDevbox } from "https://nix.fluentci.io/v0.5.0/mod.ts";
+import Client, { withDevbox } from "../../deps.ts";
 
 export enum Job {
   test = "test",
