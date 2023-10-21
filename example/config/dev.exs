@@ -4,7 +4,7 @@ import Config
 config :example, Example.Repo,
   username: System.get_env("MYSQL_USER") || "root",
   password: System.get_env("MYSQL_ROOT_PASSWORD") || "",
-  hostname: System.get_env("MYSQL_HOST") || "localhost",
+  hostname: System.get_env("MYSQL_HOST") || "mysql",
   database: "example_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
