@@ -6,9 +6,9 @@ import Config
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
 config :example, Example.Repo,
-  username: "root",
-  password: "",
-  hostname: "localhost",
+  username: System.get_env("MYSQL_USER") || "root",
+  password: System.get_env("MYSQL_ROOT_PASSWORD") || "",
+  hostname: System.get_env("MYSQL_HOST") || "localhost",
   database: "example_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
