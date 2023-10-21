@@ -8,7 +8,7 @@ import Config
 config :example, Example.Repo,
   username: System.get_env("MYSQL_USER") || "root",
   password: System.get_env("MYSQL_ROOT_PASSWORD") || "",
-  hostname: System.get_env("MYSQL_HOST") || "localhost",
+  hostname: System.get_env("MYSQL_HOST") || "mysql",
   database: "example_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10

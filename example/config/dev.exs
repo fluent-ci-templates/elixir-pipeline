@@ -2,9 +2,9 @@ import Config
 
 # Configure your database
 config :example, Example.Repo,
-  username: "root",
-  password: "",
-  hostname: "localhost",
+  username: System.get_env("MYSQL_USER") || "root",
+  password: System.get_env("MYSQL_ROOT_PASSWORD") || "",
+  hostname: System.get_env("MYSQL_HOST") || "localhost",
   database: "example_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
