@@ -1,0 +1,5 @@
+{
+  "root": "",
+  "name": "elixir",
+  "sdkRuntime": "tsiry/dagger-sdk-deno"
+}

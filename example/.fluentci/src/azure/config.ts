@@ -1,5 +1,9 @@
 import { AzurePipeline } from "fluent_azure_pipelines";
 
+/**
+ * Generates an Azure Pipeline object with the necessary steps to run the Elixir pipeline.
+ * @returns {AzurePipeline} The generated Azure Pipeline object.
+ */
 export function generateYaml(): AzurePipeline {
   const azurePipeline = new AzurePipeline();
 

@@ -1,59 +1,55 @@
-import Client from "@dagger.io/dagger";
-import { withDevbox } from "https://deno.land/x/nix_installer_pipeline@v0.3.6/src/dagger/steps.ts";
+import Client, { connect } from "../../deps.ts";
 
 export enum Job {
   test = "test",
 }
 
-export const test = async (client: Client, src = ".") => {
-  const context = client.host().directory(src);
-  const baseCtr = withDevbox(
-    client
+export const exclude = [".git", ".devbox", "deps", "_build"];
+
+export const test = async (src = ".") => {
+  await connect(async (client: Client) => {
+    const mysql = client
+      .container()
+      .from("mysql")
+      .withEnvVariable("MYSQL_ROOT_PASSWORD", "pass")
+      .withEnvVariable("MYSQL_DATABASE", "example_test")
+      .withExposedPort(3306);
+
+    const context = client.host().directory(src);
+    const baseCtr = client
       .pipeline(Job.test)
       .container()
-      .from("alpine:latest")
-      .withExec(["apk", "update"])
-      .withExec(["apk", "add", "bash", "curl"])
-      .withMountedCache("/nix", client.cacheVolume("nix"))
-      .withMountedCache("/etc/nix", client.cacheVolume("nix-etc"))
-  );
+      .from("pkgxdev/pkgx:latest")
+      .withExec(["apt-get", "update"])
+      .withExec(["apt-get", "install", "-y", "ca-certificates"])
+      .withExec(["pkgx", "install", "elixir", "mix"]);
 
-  const ctr = baseCtr
-    .withDirectory("/app", context, {
-      exclude: [".git", ".devbox", "deps", "_build"],
-    })
-    .withWorkdir("/app")
-    .withMountedCache("/root/.mix", client.cacheVolume("mix"))
-    .withMountedCache("/app/deps", client.cacheVolume("deps"))
-    .withMountedCache("/app/_build", client.cacheVolume("_build"))
-    .withExec([
-      "sh",
-      "-c",
-      "mkdir -p .devbox && eval $(devbox shell --print-env) && \
-       devbox services up -b && \
-       devbox services stop && \
-       sed -i 's/mysqld 2/mysqld --user=root 2/' .devbox/virtenv/mysql80/process-compose.yaml",
-    ])
-    .withExec([
-      "sh",
-      "-c",
-      "devbox services up -b && \
-       sleep 3 && \
-       eval $(devbox shell --print-env) && \
-       mix local.rebar --force && \
-       mix local.hex --force && \
-       HEX_HTTP_CONCURRENCY=1 HEX_HTTP_TIMEOUT=120 mix deps.get && \
-       mix ecto.create && \
-       mix test && \
-       devbox services stop",
-    ]);
+    const ctr = baseCtr
+      .withServiceBinding("mysql", mysql)
+      .withEnvVariable("MYSQL_ROOT_PASSWORD", "pass")
+      .withEnvVariable("MYSQL_DATABASE", "example_test")
+      .withEnvVariable("MYSQL_HOST", "mysql")
+      .withDirectory("/app", context, { exclude })
+      .withWorkdir("/app")
+      .withMountedCache("/root/.mix", client.cacheVolume("mix"))
+      .withMountedCache("/app/deps", client.cacheVolume("deps"))
+      .withMountedCache("/app/_build", client.cacheVolume("_build"))
+      .withExec(["mix", "local.rebar", "--force"])
+      .withExec(["mix", "local.hex", "--force"])
+      .withEnvVariable("HEX_HTTP_CONCURRENCY", "1")
+      .withEnvVariable("HEX_HTTP_TIMEOUT", "120")
+      .withExec(["mix", "deps.get"])
+      .withExec(["mix", "ecto.create"])
+      .withExec(["mix", "test"]);
 
-  const result = await ctr.stdout();
+    const result = await ctr.stdout();
 
-  console.log(result);
+    console.log(result);
+  });
+  return "Done";
 };
 
-export type JobExec = (client: Client, src?: string) => Promise<void>;
+export type JobExec = (src?: string) => Promise<string>;
 
 export const runnableJobs: Record<Job, JobExec> = {
   [Job.test]: test,
