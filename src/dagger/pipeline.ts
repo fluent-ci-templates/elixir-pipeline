@@ -1,4 +1,4 @@
-import Client, { connect, uploadContext } from "../../deps.ts";
+import { uploadContext } from "../../deps.ts";
 import * as jobs from "./jobs.ts";
 
 const { test, runnableJobs, exclude } = jobs;
