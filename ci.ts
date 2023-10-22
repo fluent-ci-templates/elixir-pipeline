@@ -1,12 +1,3 @@
-const command = new Deno.Command(Deno.execPath(), {
-  args: [
-    "run",
-    "-A",
-    "--import-map=https://deno.land/x/elixir_pipeline/import_map.json",
-    "https://deno.land/x/elixir_pipeline/src/dagger/runner.ts",
-  ],
-});
+import { test } from "https://pkg.fluentci.io/elixir_pipeline@v0.6.0/mod.ts";
 
-const { stdout } = await command.output();
-
-console.log(new TextDecoder().decode(stdout));
+await test();
