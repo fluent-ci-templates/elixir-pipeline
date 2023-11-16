@@ -13,7 +13,8 @@ export const test = async (src = ".") => {
       .from("mysql")
       .withEnvVariable("MYSQL_ROOT_PASSWORD", "pass")
       .withEnvVariable("MYSQL_DATABASE", "example_test")
-      .withExposedPort(3306);
+      .withExposedPort(3306)
+      .asService();
 
     const context = client.host().directory(src);
     const baseCtr = client
