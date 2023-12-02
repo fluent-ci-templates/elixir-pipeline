@@ -19,4 +19,5 @@ jobs:
       - name: Run Dagger Pipelines
         run: |
           dagger query --doc test.gql
+          dagger call compile --src .
         working-directory: example

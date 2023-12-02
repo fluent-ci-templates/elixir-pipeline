@@ -22,6 +22,6 @@ async function runSpecificJobs(args: jobs.Job[]) {
     if (!job) {
       throw new Error(`Job ${name} not found`);
     }
-    await job();
+    await job(".");
   }
 }
