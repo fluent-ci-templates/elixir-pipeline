@@ -13,7 +13,7 @@ A ready-to-use CI/CD Pipeline for Elixir projects.
 Run the following command in your project root:
 
 ```bash
-dagger run fluentci elixir_pipeline
+fluentci run elixir_pipeline
 ```
 
 Or, if you want to use it as a template:
@@ -27,7 +27,15 @@ This will create a `.fluentci` folder in your project.
 Now you can run the pipeline with:
 
 ```bash
-dagger run fluentci .
+fluentci run .
+```
+
+## Dagger Module
+
+Use as a [Dagger](https://dagger.io) Module:
+
+```bash
+dagger mod install github.com/fluent-ci-templates/elixir-pipeline@mod
 ```
 
 ## Jobs
@@ -36,8 +44,8 @@ dagger run fluentci .
 | ----- | ---------------- |
 | test  | Run your tests   |
 
-```graphql
-test(src: String!): String
+```typescript
+test(src: Directory | string): Promise<string>
 ```
 
 ## Programmatic usage
@@ -47,5 +55,5 @@ You can also use this pipeline programmatically:
 ```ts
 import { test } from "https://pkg.fluentci.io/elixir_pipeline@v0.7.0/mod.ts";
 
-await test();
+await test(".");
 ```
