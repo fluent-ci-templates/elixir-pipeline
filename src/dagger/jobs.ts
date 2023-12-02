@@ -1,4 +1,6 @@
-import Client, { connect } from "../../deps.ts";
+import Client, { Directory } from "../../deps.ts";
+import { connect } from "../../sdk/connect.ts";
+import { getDirectory } from "./lib.ts";
 
 export enum Job {
   test = "test",
@@ -6,7 +8,13 @@ export enum Job {
 
 export const exclude = [".git", ".devbox", "deps", "_build"];
 
-export const test = async (src = ".") => {
+/**
+ * @function
+ * @description Run your tests
+ * @param {string | Directory} src
+ * @returns {string}
+ */
+export async function test(src: Directory | string): Promise<string> {
   await connect(async (client: Client) => {
     const mysql = client
       .container()
@@ -16,7 +24,7 @@ export const test = async (src = ".") => {
       .withExposedPort(3306)
       .asService();
 
-    const context = client.host().directory(src);
+    const context = getDirectory(client, src);
     const baseCtr = client
       .pipeline(Job.test)
       .container()
@@ -48,9 +56,9 @@ export const test = async (src = ".") => {
     console.log(result);
   });
   return "Done";
-};
+}
 
-export type JobExec = (src?: string) => Promise<string>;
+export type JobExec = (src: Directory | string) => Promise<string>;
 
 export const runnableJobs: Record<Job, JobExec> = {
   [Job.test]: test,
