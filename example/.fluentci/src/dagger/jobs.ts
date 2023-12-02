@@ -40,11 +40,12 @@ export async function compile(
       .withEnvVariable("HEX_HTTP_CONCURRENCY", "1")
       .withEnvVariable("HEX_HTTP_TIMEOUT", "120")
       .withExec(["mix", "deps.get"])
-      .withExec(["mix", "compile"]);
+      .withExec(["mix", "compile"])
+      .withExec(["cp", "-r", "_build", "/_build"]);
 
     await ctr.stdout();
 
-    id = await ctr.directory("/app/_build").id();
+    id = await ctr.directory("/_build").id();
   });
   return id;
 }
