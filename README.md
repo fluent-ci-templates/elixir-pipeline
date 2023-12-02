@@ -40,11 +40,13 @@ dagger mod install github.com/fluent-ci-templates/elixir-pipeline@mod
 
 ## Jobs
 
-| Job   | Description      |
-| ----- | ---------------- |
-| test  | Run your tests   |
+| Job     | Description      |
+| ------- | ---------------- |
+| compile | Compile your code |
+| test    | Run your tests   |
 
 ```typescript
+compile(src: Directory | string): Promise<Directory | string>
 test(src: Directory | string): Promise<string>
 ```
 
