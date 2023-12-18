@@ -55,7 +55,7 @@ test(src: Directory | string): Promise<string>
 You can also use this pipeline programmatically:
 
 ```ts
-import { test } from "https://pkg.fluentci.io/elixir_pipeline@v0.7.0/mod.ts";
+import { test } from "https://pkg.fluentci.io/elixir_pipeline@v0.9.0/mod.ts";
 
 await test(".");
 ```
