@@ -1,5 +1,4 @@
-import Client, { Directory } from "../../deps.ts";
-import { connect } from "../../sdk/connect.ts";
+import { Directory, dag } from "../../deps.ts";
 import { getDirectory } from "./lib.ts";
 
 export enum Job {
@@ -18,35 +17,32 @@ export const exclude = [".git", ".devbox", "deps", "_build"];
 export async function compile(
   src: Directory | string
 ): Promise<Directory | string> {
-  let id = "";
-  await connect(async (client: Client) => {
-    const context = getDirectory(client, src);
-    const baseCtr = client
-      .pipeline(Job.compile)
-      .container()
-      .from("pkgxdev/pkgx:latest")
-      .withExec(["apt-get", "update"])
-      .withExec(["apt-get", "install", "-y", "ca-certificates"])
-      .withExec(["pkgx", "install", "elixir", "mix"]);
+  const context = await getDirectory(dag, src);
+  const baseCtr = dag
+    .pipeline(Job.compile)
+    .container()
+    .from("pkgxdev/pkgx:latest")
+    .withExec(["apt-get", "update"])
+    .withExec(["apt-get", "install", "-y", "ca-certificates"])
+    .withExec(["pkgx", "install", "elixir", "mix"]);
 
-    const ctr = baseCtr
-      .withDirectory("/app", context, { exclude })
-      .withWorkdir("/app")
-      .withMountedCache("/root/.mix", client.cacheVolume("mix"))
-      .withMountedCache("/app/deps", client.cacheVolume("deps"))
-      .withMountedCache("/app/_build", client.cacheVolume("_build"))
-      .withExec(["mix", "local.rebar", "--force"])
-      .withExec(["mix", "local.hex", "--force"])
-      .withEnvVariable("HEX_HTTP_CONCURRENCY", "1")
-      .withEnvVariable("HEX_HTTP_TIMEOUT", "120")
-      .withExec(["mix", "deps.get"])
-      .withExec(["mix", "compile"])
-      .withExec(["cp", "-r", "_build", "/_build"]);
+  const ctr = baseCtr
+    .withDirectory("/app", context, { exclude })
+    .withWorkdir("/app")
+    .withMountedCache("/root/.mix", dag.cacheVolume("mix"))
+    .withMountedCache("/app/deps", dag.cacheVolume("deps"))
+    .withMountedCache("/app/_build", dag.cacheVolume("_build"))
+    .withExec(["mix", "local.rebar", "--force"])
+    .withExec(["mix", "local.hex", "--force"])
+    .withEnvVariable("HEX_HTTP_CONCURRENCY", "1")
+    .withEnvVariable("HEX_HTTP_TIMEOUT", "120")
+    .withExec(["mix", "deps.get"])
+    .withExec(["mix", "compile"])
+    .withExec(["cp", "-r", "_build", "/_build"]);
 
-    await ctr.stdout();
+  await ctr.stdout();
 
-    id = await ctr.directory("/_build").id();
-  });
+  const id = await ctr.directory("/_build").id();
   return id;
 }
 
@@ -57,47 +53,43 @@ export async function compile(
  * @returns {Promise<string>}
  */
 export async function test(src: Directory | string): Promise<string> {
-  await connect(async (client: Client) => {
-    const mysql = client
-      .container()
-      .from("mysql")
-      .withEnvVariable("MYSQL_ROOT_PASSWORD", "pass")
-      .withEnvVariable("MYSQL_DATABASE", "example_test")
-      .withExposedPort(3306)
-      .asService();
+  const mysql = dag
+    .container()
+    .from("mysql")
+    .withEnvVariable("MYSQL_ROOT_PASSWORD", "pass")
+    .withEnvVariable("MYSQL_DATABASE", "example_test")
+    .withExposedPort(3306)
+    .asService();
 
-    const context = getDirectory(client, src);
-    const baseCtr = client
-      .pipeline(Job.test)
-      .container()
-      .from("pkgxdev/pkgx:latest")
-      .withExec(["apt-get", "update"])
-      .withExec(["apt-get", "install", "-y", "ca-certificates"])
-      .withExec(["pkgx", "install", "elixir", "mix"]);
+  const context = await getDirectory(dag, src);
+  const baseCtr = dag
+    .pipeline(Job.test)
+    .container()
+    .from("pkgxdev/pkgx:latest")
+    .withExec(["apt-get", "update"])
+    .withExec(["apt-get", "install", "-y", "ca-certificates"])
+    .withExec(["pkgx", "install", "elixir", "mix"]);
 
-    const ctr = baseCtr
-      .withServiceBinding("mysql", mysql)
-      .withEnvVariable("MYSQL_ROOT_PASSWORD", "pass")
-      .withEnvVariable("MYSQL_DATABASE", "example_test")
-      .withEnvVariable("MYSQL_HOST", "mysql")
-      .withDirectory("/app", context, { exclude })
-      .withWorkdir("/app")
-      .withMountedCache("/root/.mix", client.cacheVolume("mix"))
-      .withMountedCache("/app/deps", client.cacheVolume("deps"))
-      .withMountedCache("/app/_build", client.cacheVolume("_build"))
-      .withExec(["mix", "local.rebar", "--force"])
-      .withExec(["mix", "local.hex", "--force"])
-      .withEnvVariable("HEX_HTTP_CONCURRENCY", "1")
-      .withEnvVariable("HEX_HTTP_TIMEOUT", "120")
-      .withExec(["mix", "deps.get"])
-      .withExec(["mix", "ecto.create"])
-      .withExec(["mix", "test"]);
+  const ctr = baseCtr
+    .withServiceBinding("mysql", mysql)
+    .withEnvVariable("MYSQL_ROOT_PASSWORD", "pass")
+    .withEnvVariable("MYSQL_DATABASE", "example_test")
+    .withEnvVariable("MYSQL_HOST", "mysql")
+    .withDirectory("/app", context, { exclude })
+    .withWorkdir("/app")
+    .withMountedCache("/root/.mix", dag.cacheVolume("mix"))
+    .withMountedCache("/app/deps", dag.cacheVolume("deps"))
+    .withMountedCache("/app/_build", dag.cacheVolume("_build"))
+    .withExec(["mix", "local.rebar", "--force"])
+    .withExec(["mix", "local.hex", "--force"])
+    .withEnvVariable("HEX_HTTP_CONCURRENCY", "1")
+    .withEnvVariable("HEX_HTTP_TIMEOUT", "120")
+    .withExec(["mix", "deps.get"])
+    .withExec(["mix", "ecto.create"])
+    .withExec(["mix", "test"]);
 
-    const result = await ctr.stdout();
-
-    console.log(result);
-  });
-  return "Done";
+  const result = await ctr.stdout();
+  return result;
 }
 
 export type JobExec = (src: Directory | string) => Promise<Directory | string>;
