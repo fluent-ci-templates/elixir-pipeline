@@ -17,7 +17,7 @@ export const exclude = [".git", ".devbox", "deps", "_build"];
 export async function compile(
   src: Directory | string
 ): Promise<Directory | string> {
-  const context = await getDirectory(dag, src);
+  const context = await getDirectory(src);
   const baseCtr = dag
     .pipeline(Job.compile)
     .container()
@@ -61,7 +61,7 @@ export async function test(src: Directory | string): Promise<string> {
     .withExposedPort(3306)
     .asService();
 
-  const context = await getDirectory(dag, src);
+  const context = await getDirectory(src);
   const baseCtr = dag
     .pipeline(Job.test)
     .container()
