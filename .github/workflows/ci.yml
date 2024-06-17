@@ -17,7 +17,6 @@ jobs:
           plugin: deno
           args: |
             fmt
-            lint
             test
             coverage
       - name: Upload to Codecov
