@@ -37,7 +37,7 @@ fluentci run .
 Use as a [Dagger](https://dagger.io) Module:
 
 ```bash
-dagger mod install github.com/fluent-ci-templates/elixir-pipeline@mod
+dagger install github.com/fluent-ci-templates/elixir-pipeline@main
 ```
 
 ## Jobs
